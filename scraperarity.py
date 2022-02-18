@@ -30,12 +30,21 @@ class ScrapeRarity():
 
     
     def writeToDatabase(self,tokenId,rarityRank,overwrite):
+        # Query database for tokenId
         self.database_cursor.execute("SELECT * FROM '" + TABLENAME + "' where token_id = '" + str(tokenId) + "'")
         rows = self.database_cursor.fetchall()
+
+        # Write if there is no existing record for tokenId
         if len(rows) == 0:
-            sample = "INSERT INTO '" + TABLENAME + "' (token_id, rarity_rank) VALUES( '" + str(tokenId) + "', '" + str(rarityRank) + ")';"
-            print(sample)
-            self.database_cursor.execute("INSERT INTO '" + TABLENAME + "' (token_id, rarity_rank) VALUES( '" + str(tokenId) + "', '" + str(rarityRank) + "');")
+            insertStatement = "INSERT INTO '" + TABLENAME + "' (token_id, rarity_rank) VALUES( '" + str(tokenId) + "', '" + str(rarityRank) + "');"
+            self.database_cursor.execute(insertStatement)
+        
+        # If a record already exists, check if it's correct. If not, throw an error
+        else:
+            databaseRarityRank = rows[0]
+            print(databaseRarityRank)
+            if databaseRarityRank != rarityRank:
+                pass 
 
     def fetchAndWrite(self,tokenId):
         rarity = self.scrapeSingleItem(tokenId)
